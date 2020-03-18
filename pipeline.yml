@@ -36,7 +36,7 @@ resources:
   type: pivnet
   source:
     product_slug: platform-automation
-    api_token: 
+    api_token: ((pivnet_api_token))
 - name: configuration
   type: git
   source:
