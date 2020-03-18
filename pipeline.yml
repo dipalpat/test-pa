@@ -1,0 +1,47 @@
+---
+jobs:
+- name: test
+  plan:
+    - get: platform-automation-image
+      resource: platform-automation
+      params:
+        globs: ["*image*.tgz"]
+        unpack: true
+    - get: platform-automation-tasks
+      resource: platform-automation
+      params:
+        globs: ["*tasks*.zip"]
+        unpack: true
+    # - task: test
+    #   image: platform-automation-image
+    #   file: platform-automation-tasks/tasks/test.yml
+    - task: configure-pas
+      image: platform-automation-image
+      file: platform-automation-tasks/tasks/configure-product.yml
+      input_mapping:
+        config: configuration
+        env: configuration
+        vars: configuration
+      params:
+        CONFIG_FILE: pas.yml
+        VARS_FILES: vars/vars/pas.yml
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+resources:
+- name: platform-automation
+  type: pivnet
+  source:
+    product_slug: platform-automation
+    api_token: m_dwCGoYu7DobWgThr2a
+- name: configuration
+  type: git
+  source:
+    uri: ((configuration_repo))
+    private_key: ((platform_automation_example_git_repo.private_key))
+    paths:
+    - "environments/((iaas))/((foundation))/config/((product))"
+    - "proposed-tasks"
